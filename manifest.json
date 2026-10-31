@@ -1,0 +1,10 @@
+{
+  "id": "square-caller",
+  "name": "Square Caller",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.4",
+  "description": "Chain square dance choreography modules from your vault on a large, keyboard-driven screen for live calling.",
+  "author": "Adam Fanello",
+  "authorUrl": "https://github.com/kernwig",
+  "isDesktopOnly": true
+}
