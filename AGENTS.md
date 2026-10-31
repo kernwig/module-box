@@ -16,14 +16,17 @@ the code before changing it; don't treat this document as a spec.
 
 - **Definition of done:** `npm run check` passes — typecheck, tests, and lint
   all green. Nothing is complete otherwise.
-- **Node 24** (`.nvmrc`); `npm run build` writes `main.js` to the repo root,
-  `npm run dev` watches. With `OBSIDIAN_VAULT` set, both also copy the plugin
-  files into that vault's `.obsidian/plugins/module-box/`.
+- **Node 24** (`.nvmrc`); `npm run build` writes the release files to `dist/`
+  (`main.js`, plus copies of the root `manifest.json` and `src/styles.css`),
+  `npm run dev` watches. With `OBSIDIAN_VAULT` set, both also copy `dist/` into
+  that vault's `.obsidian/plugins/module-box/`. `manifest.json` and
+  `versions.json` stay at the repo root, where Obsidian reads them.
 - **Releases:** `npm version <patch|minor|major>` bumps `manifest.json` and
   `versions.json` and tags without a `v` prefix (Obsidian requires the tag to
   equal the manifest version). Pushing the tag runs
   `.github/workflows/release.yml`, which creates a draft release with
-  `main.js`, `manifest.json`, and `styles.css`. `main.js` is not committed.
+  `main.js`, `manifest.json`, and `styles.css` from `dist/`. `dist/` is not
+  committed.
 - **Follow Obsidian's plugin guidelines** (docs.obsidian.md, "Plugin
   guidelines"): sentence case in UI text, no top-level heading in the settings
   tab, `normalizePath()` for user-entered paths, no `innerHTML`, no console

@@ -42,9 +42,9 @@ jobs:
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: |
-            main.js
-            manifest.json
-            styles.css
+            dist/main.js
+            dist/manifest.json
+            dist/styles.css
 
       - name: Create draft release
         env:
@@ -54,4 +54,4 @@ jobs:
             --title "$GITHUB_REF_NAME" \
             --draft \
             --generate-notes \
-            main.js manifest.json styles.css
+            dist/main.js dist/manifest.json dist/styles.css

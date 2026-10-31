@@ -2,10 +2,14 @@ node_modules/
 .test-build/
 *.log
 
-# Build output. Released as GitHub release assets, not committed.
-main.js
+# Build output (main.js, plus copies of manifest.json and styles.css).
+# Released as GitHub release assets, not committed.
+dist/
 
 # Settings saved by Obsidian when the repo is used as a plugin folder.
 data.json
 
 .DS_Store
+.idea
+.vscode
+

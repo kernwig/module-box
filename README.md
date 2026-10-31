@@ -114,11 +114,11 @@ Requires Node 24 (see `.nvmrc`).
 ```sh
 npm install
 npm run check      # typecheck, tests, and lint; all must pass
-npm run build      # writes main.js to the repo root
+npm run build      # writes the plugin files to dist/
 ```
 
 To try a build in a vault, set `OBSIDIAN_VAULT` to the vault folder. `npm run
-build` then also copies the plugin files into
+build` then also copies `dist/` into
 `<vault>/.obsidian/plugins/module-box/`, and `npm run dev` does the same on
 every change. Toggle the plugin off and on in Obsidian to load the new build.
 
