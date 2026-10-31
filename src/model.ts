@@ -1,5 +1,5 @@
 /**
- * Core data model for Square Caller. Kept free of any Obsidian imports so the
+ * Core data model for Module Box. Kept free of any Obsidian imports so the
  * logic (matching, shuffling, filtering) can be unit-tested with `node --test`.
  */
 

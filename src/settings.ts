@@ -6,14 +6,14 @@
 import { FilterState, defaultFilterState } from "./filters.ts";
 import { MODULES_ROOT } from "./vault.ts";
 
-export interface SquareCallerSettings {
+export interface ModuleBoxSettings {
   modulesRoot: string;
   filters: FilterState;
   /** Filter bar shows every filter (true) or only the short set (false). */
   filtersExpanded: boolean;
 }
 
-export function defaultSettings(): SquareCallerSettings {
+export function defaultSettings(): ModuleBoxSettings {
   return {
     modulesRoot: MODULES_ROOT,
     filters: defaultFilterState(),
@@ -22,10 +22,10 @@ export function defaultSettings(): SquareCallerSettings {
 }
 
 /** Merge loaded data over defaults so new fields get sane values. */
-export function normalizeSettings(data: unknown): SquareCallerSettings {
+export function normalizeSettings(data: unknown): ModuleBoxSettings {
   const base = defaultSettings();
   if (!data || typeof data !== "object") return base;
-  const d = data as Partial<SquareCallerSettings>;
+  const d = data as Partial<ModuleBoxSettings>;
   return {
     modulesRoot: cleanRoot(d.modulesRoot) ?? base.modulesRoot,
     filtersExpanded:

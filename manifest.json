@@ -1,8 +1,8 @@
 {
-  "id": "square-caller",
-  "name": "Square Caller",
+  "id": "module-box",
+  "name": "Square Dance Module Box",
   "version": "1.0.0",
-  "minAppVersion": "1.4.4",
+  "minAppVersion": "1.14.0",
   "description": "Chain square dance choreography modules from your vault on a large, keyboard-driven screen for live calling.",
   "author": "Adam Fanello",
   "authorUrl": "https://github.com/kernwig",

@@ -3,41 +3,45 @@ import {
   Plugin,
   PluginSettingTab,
   Setting,
+  addIcon,
   debounce,
   normalizePath,
 } from "obsidian";
-import { SquareCallerView, VIEW_TYPE } from "./view.ts";
+import { ModuleBoxView, VIEW_TYPE } from "./view.ts";
 import {
-  SquareCallerSettings,
+  ModuleBoxSettings,
   defaultSettings,
   normalizeSettings,
 } from "./settings.ts";
 import { MODULES_ROOT } from "./vault.ts";
+import { ICON_ID, ICON_SVG } from "./icon.ts";
 
-export default class SquareCallerPlugin extends Plugin {
-  settings: SquareCallerSettings = defaultSettings();
+export default class ModuleBoxPlugin extends Plugin {
+  settings: ModuleBoxSettings = defaultSettings();
 
   async onload(): Promise<void> {
     await this.loadSettings();
 
-    this.registerView(VIEW_TYPE, (leaf) => new SquareCallerView(leaf, this));
+    addIcon(ICON_ID, ICON_SVG);
 
-    this.addRibbonIcon("music", "Open Square Caller", () => this.activateView());
+    this.registerView(VIEW_TYPE, (leaf) => new ModuleBoxView(leaf, this));
+
+    this.addRibbonIcon(ICON_ID, "Open Module Box", () => this.activateView());
 
     // Obsidian shows the plugin name before command names, so they omit it.
     this.addCommand({
-      id: "open-square-caller",
-      name: "Open caller view",
+      id: "open-module-box",
+      name: "Open Module Box",
       callback: () => this.activateView(),
     });
 
     this.addCommand({
-      id: "reload-square-caller-modules",
+      id: "reload-modules",
       name: "Reload modules",
       callback: () => this.reloadAllViews(),
     });
 
-    this.addSettingTab(new SquareCallerSettingTab(this.app, this));
+    this.addSettingTab(new ModuleBoxSettingTab(this.app, this));
   }
 
   onunload(): void {
@@ -57,7 +61,7 @@ export default class SquareCallerPlugin extends Plugin {
   reloadAllViews(): void {
     for (const leaf of this.app.workspace.getLeavesOfType(VIEW_TYPE)) {
       const v = leaf.view;
-      if (v instanceof SquareCallerView) void v.reloadModules();
+      if (v instanceof ModuleBoxView) void v.reloadModules();
     }
   }
 
@@ -76,11 +80,11 @@ export function cleanFolderPath(raw: string): string {
   return p === "" || p === "/" ? MODULES_ROOT : p;
 }
 
-class SquareCallerSettingTab extends PluginSettingTab {
+class ModuleBoxSettingTab extends PluginSettingTab {
   /** Reload once typing in the folder field pauses, not on every keystroke. */
   private reloadSoon = debounce(() => this.plugin.reloadAllViews(), 600, true);
 
-  constructor(app: App, private plugin: SquareCallerPlugin) {
+  constructor(app: App, private plugin: ModuleBoxPlugin) {
     super(app, plugin);
   }
 

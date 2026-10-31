@@ -11,7 +11,7 @@ import { extractBody } from "./body.ts";
 export { extractBody, isModule };
 
 /** Folder under the vault that holds the modules. */
-export const MODULES_ROOT = "Square-Modules";
+export const MODULES_ROOT = "Module-Box";
 
 export async function loadModules(app: App, root = MODULES_ROOT): Promise<Module[]> {
   const files = app.vault.getMarkdownFiles().filter((f) => isModuleFile(f, root));

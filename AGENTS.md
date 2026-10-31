@@ -1,6 +1,8 @@
-# Square Caller — Agent Guide
+# Module Box — Agent Guide
 
-A live square-dance calling aid, built as an Obsidian plugin. While calling, you
+**Square Dance Module Box** ("Module Box" for short) is a square-dance calling
+aid, built as an Obsidian plugin. It is the digital version of a caller's box of
+3×5 module cards. While calling, you
 pick a start formation and chain choreography modules by matching one module's
 `end` to the next module's `start`, on a big, high-contrast, keyboard-driven
 screen.
@@ -16,7 +18,7 @@ the code before changing it; don't treat this document as a spec.
   all green. Nothing is complete otherwise.
 - **Node 24** (`.nvmrc`); `npm run build` writes `main.js` to the repo root,
   `npm run dev` watches. With `OBSIDIAN_VAULT` set, both also copy the plugin
-  files into that vault's `.obsidian/plugins/square-caller/`.
+  files into that vault's `.obsidian/plugins/module-box/`.
 - **Releases:** `npm version <patch|minor|major>` bumps `manifest.json` and
   `versions.json` and tags without a `v` prefix (Obsidian requires the tag to
   equal the manifest version). Pushing the tag runs
@@ -37,6 +39,13 @@ the code before changing it; don't treat this document as a spec.
   boolean "flag" properties are all derived from the vault at load. Don't
   reintroduce hard-coded vocabularies.
 - **User-facing wording:** call boolean properties "flags," not "booleans."
+- **Naming:** the manifest `name` is the long form, "Square Dance Module Box"
+  (it is what the community directory and the command palette show). Text the
+  plugin controls (view title, ribbon tooltip, help title) uses "Module Box".
+  Obsidian rejects "Obsidian" in the name, and the id `module-box` must never
+  change once published.
+- **Icon:** `src/icon.ts` is a custom SVG on Obsidian's 100×100 icon grid, drawn
+  in `currentColor`; keep strokes near 6 so it matches Lucide's weight.
 
 ## Key concepts
 

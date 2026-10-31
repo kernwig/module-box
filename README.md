@@ -1,13 +1,16 @@
-# Square Caller
+# Square Dance Module Box
 
-An Obsidian plugin for calling square dances live. You keep choreography
-**modules** as notes in your vault. Square Caller shows them on a large,
-high-contrast screen you can read from the mic, and suggests what to call next
-by matching the formation one module ends in to the formation the next one
-starts from.
+**Module Box** is an Obsidian plugin for square dance callers. It replaces the
+box of 3×5 cards, one choreography **module** per card, that callers used to
+carry around. Your modules are notes in your Obsidian vault. When the dance
+floor reaches a formation, Module Box shows the modules that start there on a
+large, high-contrast screen you can read from the mic. When a module ends,
+it can offer the ones that start where that one finishes.
 
-Square Caller works on desktop only. It reads your notes and only writes to
+Module Box works on desktop only. It reads your notes and only writes to
 them when you toggle a flag on a card.
+
+![Module Box view: filter bar above a 2×2 grid of module cards](assets/module-box-view.png)
 
 ## How the screen works
 
@@ -22,19 +25,19 @@ The view is a 2×2 grid of cards.
 - **Auto-follow:** when this is on, choosing a module sets the Start filter to
   that module's end formation, so the next options always chain on.
 - **Filters:** Start and End formation, Author, Singer, a search of the calls,
-  Level and Difficulty ranges, and flags. The short filter bar shows Start,
+  Level and Difficulty ranges, and custom flags. The short filter bar shows Start,
   End and Auto-follow, plus Author, Singer and Search while they're set. The
   chevron under the `?` button shows every filter.
 
-The module order is shuffled each time the view opens, and when you press `s`,
-so the suggestions vary. Filters are remembered between sessions.
+The module order is shuffled each time the view opens and when you click the Shuffle
+button. Filters are remembered between sessions.
 
 ## Writing modules
 
-A module is a markdown note in the modules folder (`Square-Modules` by default;
-change it in the plugin settings). Subfolders are included, and notes whose
-names start with `_`, such as `_Template.md`, are skipped. A note must have
-`start`, `end`, and `level` properties to count as a module.
+A module is a markdown note in the modules folder (`Module-Box` by default;
+change it in the plugin settings). Subfolders are included, so you can organize
+your modules however you like. Notes whose names start with `_`, such as `_Template.md`,
+are skipped. A note must have `start`, `end`, and `level` properties to count as a module.
 
 ```markdown
 ---
@@ -96,12 +99,12 @@ not the comments after `---`.
 ## Installation
 
 Install from **Settings → Community plugins → Browse** and search for
-"Square Caller". Then open the view from the music icon in the ribbon, or
-with the "Square Caller: Open caller view" command.
+"Square Dance Module Box". Then open the view from the card box icon in the
+ribbon, or with the "Square Dance Module Box: Open Module Box" command.
 
 To install by hand, download `main.js`, `manifest.json`, and `styles.css` from
-the latest [release](https://github.com/kernwig/square-caller/releases) into
-`<vault>/.obsidian/plugins/square-caller/`, then enable the plugin under
+the latest [release](https://github.com/kernwig/module-box/releases) into
+`<vault>/.obsidian/plugins/module-box/`, then enable the plugin under
 Community plugins.
 
 ## Development
@@ -116,7 +119,7 @@ npm run build      # writes main.js to the repo root
 
 To try a build in a vault, set `OBSIDIAN_VAULT` to the vault folder. `npm run
 build` then also copies the plugin files into
-`<vault>/.obsidian/plugins/square-caller/`, and `npm run dev` does the same on
+`<vault>/.obsidian/plugins/module-box/`, and `npm run dev` does the same on
 every change. Toggle the plugin off and on in Obsidian to load the new build.
 
 ```sh

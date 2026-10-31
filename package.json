@@ -1,12 +1,12 @@
 {
-  "name": "square-caller",
+  "name": "module-box",
   "version": "1.0.0",
-  "description": "Obsidian plugin: live square dance calling aid.",
+  "description": "Obsidian plugin: square dance choreography modules for callers.",
   "private": true,
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kernwig/square-caller.git"
+    "url": "git+https://github.com/kernwig/module-box.git"
   },
   "type": "module",
   "engines": {

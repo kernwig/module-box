@@ -1,5 +1,5 @@
 /**
- * The Square Caller view: a big, high-contrast, keyboard-driven 2x2 grid for
+ * The Module Box view: a big, high-contrast, keyboard-driven 2x2 grid for
  * live calling. All filter controls are built from values discovered in the
  * vault; nothing about the formation/boolean vocabulary is hard-coded.
  */
@@ -28,9 +28,10 @@ import {
   normalizeDifficulty,
 } from "./ordering.ts";
 import { loadModules, readModule, isModuleFile, toggleBoolean } from "./vault.ts";
-import type SquareCallerPlugin from "./main.ts";
+import type ModuleBoxPlugin from "./main.ts";
+import { ICON_ID } from "./icon.ts";
 
-export const VIEW_TYPE = "square-caller-view";
+export const VIEW_TYPE = "module-box-view";
 
 /** Search waits for a pause in typing this long before filtering... */
 const SEARCH_DEBOUNCE_MS = 300;
@@ -79,7 +80,7 @@ const LABEL_TOOLTIPS: Record<string, string> = {
   Flags: "Require each toggled-on flag to be true on the module.",
 };
 
-export class SquareCallerView extends ItemView {
+export class ModuleBoxView extends ItemView {
   private engine!: Engine;
   private modules: Module[] = [];
   private startValues: string[] = [];
@@ -100,7 +101,7 @@ export class SquareCallerView extends ItemView {
   /** False until the first full load; file events before that are ignored. */
   private loaded = false;
 
-  constructor(leaf: WorkspaceLeaf, private plugin: SquareCallerPlugin) {
+  constructor(leaf: WorkspaceLeaf, private plugin: ModuleBoxPlugin) {
     super(leaf);
   }
 
@@ -108,10 +109,10 @@ export class SquareCallerView extends ItemView {
     return VIEW_TYPE;
   }
   getDisplayText(): string {
-    return "Square Caller";
+    return "Module Box";
   }
   getIcon(): string {
-    return "music";
+    return ICON_ID;
   }
 
   async onOpen(): Promise<void> {
@@ -874,7 +875,7 @@ class HelpModal extends Modal {
     const { contentEl, modalEl } = this;
     modalEl.addClass("sqc-help-modal");
     contentEl.empty();
-    this.titleEl.setText("Square Caller help");
+    this.titleEl.setText("Module Box help");
 
     this.renderOverview(contentEl);
     this.renderTable(contentEl, "Mouse", MOUSE_HELP);
