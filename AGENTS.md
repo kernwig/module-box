@@ -14,6 +14,9 @@ the code before changing it; don't treat this document as a spec.
 
 ## Working rules
 
+- **README is for users.** Obsidian shows the whole `README.md` as the plugin's
+  description in the community directory. Keep build, release, and other
+  developer notes in `CONTRIBUTING.md` (or here), not in the README.
 - **Definition of done:** `npm run check` passes — typecheck, tests, and lint
   all green. Nothing is complete otherwise.
 - **Node 24** (`.nvmrc`); `npm run build` writes the release files to `dist/`
