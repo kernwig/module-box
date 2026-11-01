@@ -2,7 +2,7 @@ import {
   App,
   Plugin,
   PluginSettingTab,
-  Setting,
+  SettingDefinitionItem,
   addIcon,
   debounce,
   normalizePath,
@@ -30,7 +30,7 @@ export default class ModuleBoxPlugin extends Plugin {
 
     // Obsidian shows the plugin name before command names, so they omit it.
     this.addCommand({
-      id: "open-module-box",
+      id: "open-view",
       name: "Open Module Box",
       callback: () => this.activateView(),
     });
@@ -88,22 +88,24 @@ class ModuleBoxSettingTab extends PluginSettingTab {
     super(app, plugin);
   }
 
-  display(): void {
-    const { containerEl } = this;
-    containerEl.empty();
+  getSettingDefinitions(): SettingDefinitionItem[] {
+    return [
+      {
+        name: "Modules folder",
+        desc: "Vault folder that holds the choreography modules, including its subfolders.",
+        control: { type: "folder", key: "modulesRoot", placeholder: MODULES_ROOT },
+      },
+    ];
+  }
 
-    new Setting(containerEl)
-      .setName("Modules folder")
-      .setDesc("Vault folder that holds the choreography modules, including its subfolders.")
-      .addText((t) =>
-        t
-          .setPlaceholder(MODULES_ROOT)
-          .setValue(this.plugin.settings.modulesRoot)
-          .onChange(async (v) => {
-            this.plugin.settings.modulesRoot = cleanFolderPath(v);
-            await this.plugin.saveSettings();
-            this.reloadSoon();
-          }),
-      );
+  getControlValue(key: string): unknown {
+    return key === "modulesRoot" ? this.plugin.settings.modulesRoot : undefined;
+  }
+
+  async setControlValue(key: string, value: unknown): Promise<void> {
+    if (key !== "modulesRoot" || typeof value !== "string") return;
+    this.plugin.settings.modulesRoot = cleanFolderPath(value);
+    await this.plugin.saveSettings();
+    this.reloadSoon();
   }
 }

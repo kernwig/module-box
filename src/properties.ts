@@ -4,7 +4,7 @@
  * what lets the UI build its filter strips without any hard-coded schema.
  */
 
-import { Module, asBoolean, asString, FrontmatterValue } from "./model.ts";
+import { Module, asBoolean, asString } from "./model.ts";
 
 /** Keys that are modeled explicitly and should not appear as generic chips. */
 export const RESERVED_KEYS = new Set([
@@ -69,7 +69,7 @@ function addDistinct(map: Map<string, string[]>, key: string, value: string): vo
 export function distinctValues(modules: Module[], key: string): string[] {
   const out: string[] = [];
   for (const m of modules) {
-    const s = asString(m.frontmatter[key] as FrontmatterValue | undefined);
+    const s = asString(m.frontmatter[key]);
     if (s !== null && !out.includes(s)) out.push(s);
   }
   return out;

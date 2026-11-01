@@ -18,7 +18,9 @@ the code before changing it; don't treat this document as a spec.
   description in the community directory. Keep build, release, and other
   developer notes in `CONTRIBUTING.md` (or here), not in the README.
 - **Definition of done:** `npm run check` passes — typecheck, tests, and lint
-  all green. Nothing is complete otherwise.
+  all green. Nothing is complete otherwise. Lint uses `eslint-plugin-obsidianmd`
+  (type-aware), the same checks Obsidian's plugin review runs, so treat its
+  warnings as review feedback.
 - **Node 24** (`.nvmrc`); `npm run build` writes the release files to `dist/`
   (`main.js`, plus copies of the root `manifest.json` and `src/styles.css`),
   `npm run dev` watches. With `OBSIDIAN_VAULT` set, both also copy `dist/` into

@@ -1,10 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Module, getEnd } from "./model.ts";
+import { FrontmatterValue, Module, getEnd } from "./model.ts";
 import { defaultFilterState } from "./filters.ts";
 import { Engine } from "./engine.ts";
 
-function mod(path: string, fm: Record<string, any>, lines: string[] = ["Call"]): Module {
+function mod(path: string, fm: Record<string, FrontmatterValue>, lines: string[] = ["Call"]): Module {
   return { path, title: path, frontmatter: fm, lines };
 }
 
@@ -54,8 +54,8 @@ test("pickNext promotes whole bottom row and keeps positions", () => {
   e.pickNext(0);
   const top = e.snapshot().top;
   assert.deepEqual(
-    top.map((m) => (m ? (m as Module).path : null)),
-    before.map((m) => (m ? (m as Module).path : null)),
+    top.map((m) => (m ? m.path : null)),
+    before.map((m) => (m ? m.path : null)),
   );
 });
 
@@ -144,7 +144,7 @@ test("selectTop switches selected card and re-applies auto-follow", () => {
     e.selectTop(1);
     assert.equal(e.snapshot().selectedIndex, 1);
     // auto-follow should set start to the newly selected card's end
-    assert.equal(e.filters.start, getEnd(top[1] as Module));
+    assert.equal(e.filters.start, getEnd(top[1]));
   }
 });
 

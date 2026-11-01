@@ -5,6 +5,7 @@ Requires Node 24 (see `.nvmrc`).
 ```sh
 npm install
 npm run check      # typecheck, tests, and lint; all must pass
+                   # lint includes Obsidian's review rules (eslint-plugin-obsidianmd)
 npm run build      # writes the plugin files to dist/
 ```
 

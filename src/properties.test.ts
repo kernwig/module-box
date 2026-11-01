@@ -1,9 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { Module } from "./model.ts";
+import { FrontmatterValue, Module } from "./model.ts";
 import { discoverProperties, distinctValues } from "./properties.ts";
 
-function mod(fm: Record<string, any>): Module {
+function mod(fm: Record<string, FrontmatterValue>): Module {
   return { path: Math.random().toString(), title: "t", frontmatter: fm, lines: [] };
 }
 

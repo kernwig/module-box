@@ -4,7 +4,7 @@
  * for the call lines.
  */
 
-import { App, TFile } from "obsidian";
+import { App, TFile, Vault } from "obsidian";
 import { Module, FrontmatterValue, isModule } from "./model.ts";
 import { extractBody } from "./body.ts";
 
@@ -14,7 +14,13 @@ export { extractBody, isModule };
 export const MODULES_ROOT = "Module-Box";
 
 export async function loadModules(app: App, root = MODULES_ROOT): Promise<Module[]> {
-  const files = app.vault.getMarkdownFiles().filter((f) => isModuleFile(f, root));
+  // Walk only the modules folder rather than enumerating the whole vault.
+  const folder = app.vault.getFolderByPath(root);
+  if (!folder) return [];
+  const files: TFile[] = [];
+  Vault.recurseChildren(folder, (f) => {
+    if (f instanceof TFile && isModuleFile(f, root)) files.push(f);
+  });
   const out: Module[] = [];
   for (const f of files) {
     const mod = await readModule(app, f);
@@ -61,7 +67,7 @@ export async function toggleBoolean(
   const file = app.vault.getAbstractFileByPath(path);
   if (!(file instanceof TFile)) return null;
   let result: boolean | null = null;
-  await app.fileManager.processFrontMatter(file, (fm) => {
+  await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
     const cur = fm[key];
     const next = !(cur === true || cur === "true");
     fm[key] = next;

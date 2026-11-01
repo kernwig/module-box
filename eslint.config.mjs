@@ -1,25 +1,37 @@
-import js from "@eslint/js";
-import tseslint from "typescript-eslint";
+import { defineConfig } from "eslint/config";
+import obsidianmd from "eslint-plugin-obsidianmd";
 
-export default tseslint.config(
+// obsidianmd's recommended set already includes ESLint's and typescript-eslint's
+// type-checked recommended rules, plus the checks Obsidian's plugin review runs.
+export default defineConfig([
   {
     ignores: ["node_modules/**", "dist/**", ".test-build/**", "**/*.mjs"],
   },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+  ...obsidianmd.configs.recommended,
   {
     files: ["src/**/*.ts"],
     languageOptions: {
-      ecmaVersion: 2022,
-      sourceType: "module",
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
-      "@typescript-eslint/no-explicit-any": "off",
       "no-empty": ["error", { allowEmptyCatch: true }],
+      // Off: it flags deliberate lowercase option labels that mirror module
+      // values, and the plugin forbids disabling it per line.
+      "obsidianmd/ui/sentence-case": "off",
     },
   },
-);
+  {
+    // node:test's test() returns a promise the runner tracks itself.
+    files: ["src/**/*.test.ts"],
+    rules: {
+      "@typescript-eslint/no-floating-promises": "off",
+    },
+  },
+]);
