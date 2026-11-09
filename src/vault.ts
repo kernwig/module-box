@@ -69,9 +69,16 @@ export async function toggleBoolean(
   let result: boolean | null = null;
   await app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
     const cur = fm[key];
-    const next = !(cur === true || cur === "true");
-    fm[key] = next;
-    result = next;
+    const isOn = cur === true || cur === "true";
+    if (isOn) {
+      // Remove the key entirely rather than writing `false` — flags are
+      // "present (true)" or "absent", not tri-state.
+      delete fm[key];
+      result = false;
+    } else {
+      fm[key] = true;
+      result = true;
+    }
   });
   return result;
 }

@@ -14,6 +14,7 @@ import {
   TAbstractFile,
   setIcon,
   setTooltip,
+  AbstractInputSuggest,
 } from "obsidian";
 import { Module, asBoolean, getEnd, getLevel, getDifficulty, isModule } from "./model.ts";
 import { Engine } from "./engine.ts";
@@ -77,7 +78,7 @@ const LABEL_TOOLTIPS: Record<string, string> = {
   Singer: "Filter singing-call modules by kind. \u201cno\u201d matches modules that are not singing calls.",
   Search:
     "Find modules whose calls contain every word typed (any order). Use * as a wildcard within a line, e.g. walk*dodge. Shortcut: / to jump here; Enter or Esc to leave.",
-  Flags: "Require each toggled-on flag to be true on the module.",
+  Flags: "Require each active flag (green pill) to be true on the module. Click a pill to remove it; type in the input or press + to add one.",
 };
 
 export class ModuleBoxView extends ItemView {
@@ -92,6 +93,8 @@ export class ModuleBoxView extends ItemView {
   private lastHighlightDir = 1;
   /** Set by the `/` shortcut: next render shows and focuses the search box. */
   private focusSearchOnRender = false;
+  /** Set by the `+` shortcut: next render shows and focuses the flag input. */
+  private focusFlagInputOnRender = false;
   /** Search text typed but not yet applied (waiting on the debounce). */
   private pendingSearch: string | null = null;
   private searchTimer: number | null = null;
@@ -286,6 +289,28 @@ export class ModuleBoxView extends ItemView {
         this.render();
         return;
       }
+      case "+": {
+        // Jump to the flag input. Rendering with this flag set also reveals the
+        // flags strip in the short filter view.
+        e.preventDefault();
+        this.focusFlagInputOnRender = true;
+        this.render();
+        return;
+      }
+      case "-": {
+        // Clear all active flags.
+        e.preventDefault();
+        const hadActive = Object.values(this.filters.booleans).some((v) => v === true);
+        if (hadActive) {
+          for (const key of Object.keys(this.filters.booleans)) {
+            this.filters.booleans[key] = false;
+          }
+          await this.persist();
+          this.render();
+          new Notice("Cleared all flag filters");
+        }
+        return;
+      }
       case "?":
         this.openHelp();
         break;
@@ -365,6 +390,8 @@ export class ModuleBoxView extends ItemView {
     this.renderHelpButton(root);
     const focusSearch = this.focusSearchOnRender;
     this.focusSearchOnRender = false;
+    const focusFlagInput = this.focusFlagInputOnRender;
+    this.focusFlagInputOnRender = false;
     this.renderFilters(root, searchCaret !== null || focusSearch);
     this.renderGrid(root);
     const input = root.querySelector<HTMLInputElement>("input.sqc-search");
@@ -377,6 +404,13 @@ export class ModuleBoxView extends ItemView {
       input.setSelectionRange(searchCaret[0], searchCaret[1]);
     } else if (hadFocus) {
       root.focus();
+    }
+    // Flag input focus (after search, since only one can be focused)
+    if (focusFlagInput) {
+      const flagInput = root.querySelector<HTMLInputElement>("input.sqc-flag-input");
+      if (flagInput) {
+        flagInput.focus();
+      }
     }
     // Keep the highlighted line visible along with its neighbors (one line of
     // context above and below, when they exist). Scrolling both neighbors into
@@ -430,6 +464,10 @@ export class ModuleBoxView extends ItemView {
     if (expanded || this.filters.singer !== null) this.renderSingerSelect(bar);
     if (expanded || this.searchText() !== "" || searchFocused) this.renderSearch(bar);
 
+    // Flags: show in short view if any active, always in long view.
+    const hasActiveFlags = Object.values(this.filters.booleans).some((v) => v === true);
+    if (expanded || hasActiveFlags || this.focusFlagInputOnRender) this.renderBooleanFilters(bar);
+
     // Long view only.
     if (expanded) {
       this.renderRange(bar, "Level", LEVEL_ORDER, this.filters.level, this.levelValues());
@@ -440,7 +478,6 @@ export class ModuleBoxView extends ItemView {
         this.filters.difficulty,
         this.difficultyValues(),
       );
-      this.renderBooleanFilters(bar);
     }
 
     // Positioned by CSS at the bar's bottom-right, aligned under the ? button.
@@ -651,19 +688,40 @@ export class ModuleBoxView extends ItemView {
     if (this.booleanKeys.length === 0) return;
     const wrap = parent.createDiv({ cls: "sqc-strip" });
     this.labelEl(wrap, "Flags");
-    const chips = wrap.createDiv({ cls: "sqc-chips" });
-    for (const key of this.booleanKeys) {
-      const on = this.filters.booleans[key] === true;
-      const b = chips.createEl("button", {
-        cls: "sqc-chip sqc-flag" + (on ? " is-on" : ""),
-        text: key,
-      });
-      b.onclick = async () => {
-        this.filters.booleans[key] = !on;
+    const container = wrap.createDiv({ cls: "sqc-flag-pills" });
+
+    // Active flags as removable pills
+    const activeKeys = Object.entries(this.filters.booleans)
+      .filter(([_k, v]) => v === true)
+      .map(([k, _v]) => k);
+
+    for (const key of activeKeys) {
+      const pill = container.createDiv({ cls: "sqc-flag-pill" });
+      pill.textContent = key;
+      pill.onclick = async () => {
+        this.filters.booleans[key] = false;
         await this.persist();
         this.render();
       };
     }
+
+    // Input for adding new flags
+    const input = container.createEl("input", {
+      cls: "sqc-flag-input",
+      attr: { placeholder: "+ Add flag…", type: "text" },
+    });
+
+    // Attach suggest dropdown
+    new FlagInputSuggest(
+      this.app,
+      input,
+      () => this.booleanKeys,
+      () => this.filters.booleans,
+    ).onSelect(async (key: string) => {
+      this.filters.booleans[key] = true;
+      await this.persist();
+      this.render();
+    });
   }
 
   private renderAutoFollow(parent: HTMLElement, expanded: boolean): void {
@@ -801,7 +859,7 @@ export class ModuleBoxView extends ItemView {
   /** Render the small, clickable property row on a card. */
   private renderProps(card: HTMLElement, m: Module): void {
     const row = card.createDiv({ cls: "sqc-card-props" });
-    const flow = `${m.frontmatter["start"] ?? "?"} → ${getEnd(m) ?? "?"}`;
+    const flow = `${m.frontmatter["start"] ?? "?"} →\u00A0${getEnd(m) ?? "?"}`;
     row.createSpan({ cls: "sqc-prop sqc-prop-flow", text: flow });
     if (m.frontmatter["level"]) {
       row.createSpan({ cls: "sqc-prop", text: String(m.frontmatter["level"]) });
@@ -809,19 +867,32 @@ export class ModuleBoxView extends ItemView {
     if (m.frontmatter["difficulty"]) {
       row.createSpan({ cls: "sqc-prop", text: String(m.frontmatter["difficulty"]) });
     }
-    // Clickable boolean properties, discovered per key.
-    for (const key of this.booleanKeys) {
+    // Boolean properties (flags) as clickable chips.
+    // Color indicates true/false; click to toggle.
+    // True values first, alphabetical within each group.
+    const sortedKeys = [...this.booleanKeys].sort((a, b) => {
+      const aOn = asBoolean(m.frontmatter[a]) === true;
+      const bOn = asBoolean(m.frontmatter[b]) === true;
+      if (aOn !== bOn) return aOn ? -1 : 1;
+      return 0; // preserve discovery (alphabetical) order within each group
+    });
+    for (const key of sortedKeys) {
       const val = asBoolean(m.frontmatter[key]);
       const on = val === true;
-      const chip = row.createSpan({
+      const chip = row.createEl("button", {
         cls: "sqc-prop sqc-prop-bool" + (on ? " is-on" : " is-off"),
-        text: `${key}: ${on ? "✓" : "✗"}`,
+        text: key,
       });
       chip.onclick = async (ev) => {
         ev.stopPropagation(); // don't trigger card pick
         const next = await toggleBoolean(this.app, m.path, key);
         if (next !== null) {
-          m.frontmatter[key] = next;
+          // toggleBoolean deletes the key on turn-off; reflect that locally.
+          if (next) {
+            m.frontmatter[key] = true;
+          } else {
+            delete m.frontmatter[key];
+          }
           this.render();
         }
       };
@@ -845,6 +916,8 @@ const SHORTCUTS: KeyRow[] = [
   [["a"], "Toggle auto-follow"],
   [["f"], "Show more or fewer filters (same as the chevron under the ?)"],
   [["/"], "Jump to the search box (Enter or Esc to leave it)"],
+  [["+"], "Jump to the flag input to add a flag"],
+  [["-"], "Clear all flag filters"],
   [["?"], "Show this help"],
   [["Esc"], "Close this help (or the ✕ in the corner)"],
   // Formation group goes last so no unrelated rows sit under its heading.
@@ -865,6 +938,39 @@ const MOUSE_HELP: [string, string][] = [
   ["Chevron under the ?", "Show all filters, or only Start, End, Auto-follow, and any of Author, Singer, Search that are set"],
   ["Click × in the search box", "Clear the search"],
 ];
+
+/**
+ * Suggest dropdown for flag input: shows available boolean keys that are not
+ * already active, filtered by the input query.
+ */
+class FlagInputSuggest extends AbstractInputSuggest<string> {
+  constructor(
+    app: App,
+    inputEl: HTMLInputElement,
+    private getKeys: () => string[],
+    private getActive: () => Record<string, boolean>,
+  ) {
+    super(app, inputEl);
+  }
+
+  protected getSuggestions(query: string): string[] {
+    const lower = query.toLowerCase();
+    return this.getKeys().filter(
+      (k) => !this.getActive()[k] && k.toLowerCase().includes(lower),
+    );
+  }
+
+  renderSuggestion(value: string, el: HTMLElement): void {
+    el.setText(value);
+  }
+
+  selectSuggestion(value: string, evt: MouseEvent | KeyboardEvent): void {
+    // Call parent to trigger onSelect callback
+    super.selectSuggestion(value, evt);
+    // Then clear the input
+    this.setValue("");
+  }
+}
 
 class HelpModal extends Modal {
   constructor(app: App) {

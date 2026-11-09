@@ -19,6 +19,7 @@
     "test": "node esbuild.test.mjs",
     "lint": "eslint .",
     "check": "npm run typecheck && npm run test && npm run lint",
+    "install": "OBSIDIAN_VAULT=$PWD/../BDP-Obsidian/.obsidian/plugins/module-box npm run build",
     "version": "node version-bump.mjs && git add manifest.json versions.json"
   },
   "devDependencies": {

@@ -97,16 +97,44 @@
   border-color: var(--interactive-accent);
   font-weight: 700;
 }
-.sqc-flag {
-  border-color: var(--background-modifier-border);
-  opacity: 0.7;
+/* Flags: pill-based input with removable active flags */
+.sqc-flag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
 }
-.sqc-flag.is-on {
+.sqc-flag-pill {
+  display: inline-flex;
+  align-items: center;
   background: #1f7a3d;
   color: #fff;
-  border-color: #1f7a3d;
-  opacity: 1;
+  border: 1px solid #1f7a3d;
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 13px;
   font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.sqc-flag-pill:hover {
+  opacity: 0.85;
+}
+.sqc-flag-input {
+  flex: 0 1 auto;
+  width: 100px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  background: var(--background-primary);
+  color: var(--text-normal);
+}
+.sqc-flag-input:focus {
+  outline: none;
+  border-color: var(--interactive-accent);
 }
 .sqc-autofollow.is-active {
   background: #2a5db0;
@@ -232,15 +260,19 @@
 }
 .sqc-card-props {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: 6px;
   margin-bottom: 8px;
   font-size: 14px;
+  overflow: hidden;
 }
 .sqc-prop {
   padding: 2px 8px;
   border-radius: 6px;
   background: var(--background-modifier-hover);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 .sqc-prop-flow {
   font-weight: 700;
