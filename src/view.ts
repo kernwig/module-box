@@ -392,7 +392,7 @@ export class ModuleBoxView extends ItemView {
     this.focusSearchOnRender = false;
     const focusFlagInput = this.focusFlagInputOnRender;
     this.focusFlagInputOnRender = false;
-    this.renderFilters(root, searchCaret !== null || focusSearch);
+    this.renderFilters(root, searchCaret !== null || focusSearch, focusFlagInput);
     this.renderGrid(root);
     const input = root.querySelector<HTMLInputElement>("input.sqc-search");
     if (focusSearch && input) {
@@ -446,7 +446,7 @@ export class ModuleBoxView extends ItemView {
     new HelpModal(this.app).open();
   }
 
-  private renderFilters(root: HTMLElement, searchFocused: boolean): void {
+  private renderFilters(root: HTMLElement, searchFocused: boolean, flagInputFocused: boolean): void {
     const expanded = this.plugin.settings.filtersExpanded;
     const bar = root.createDiv({ cls: "sqc-filters" + (expanded ? " is-expanded" : " is-collapsed") });
 
@@ -464,9 +464,9 @@ export class ModuleBoxView extends ItemView {
     if (expanded || this.filters.singer !== null) this.renderSingerSelect(bar);
     if (expanded || this.searchText() !== "" || searchFocused) this.renderSearch(bar);
 
-    // Flags: show in short view if any active, always in long view.
+    // Flags: show in short view if any active, or when the '+' shortcut was pressed, always in long view.
     const hasActiveFlags = Object.values(this.filters.booleans).some((v) => v === true);
-    if (expanded || hasActiveFlags || this.focusFlagInputOnRender) this.renderBooleanFilters(bar);
+    if (expanded || hasActiveFlags || flagInputFocused) this.renderBooleanFilters(bar);
 
     // Long view only.
     if (expanded) {
